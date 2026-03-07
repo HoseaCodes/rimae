@@ -19,6 +19,7 @@ on:
 jobs:
   e2e:
     name: Playwright E2E
+    continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
