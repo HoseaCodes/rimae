@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PlusCircle, Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { VCTRL_PROJECT_ID } from '@/lib/constants'
+import { RIMAE_PROJECT_ID } from '@/lib/constants'
 import { StatsGrid } from '@/components/dashboard/StatsGrid'
 import { RecentEvents } from '@/components/dashboard/RecentEvents'
 import { CategoryBreakdown } from '@/components/dashboard/CategoryBreakdown'
@@ -30,43 +30,43 @@ export default async function DashboardPage() {
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', VCTRL_PROJECT_ID),
+      .eq('project_id', RIMAE_PROJECT_ID),
 
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', VCTRL_PROJECT_ID)
+      .eq('project_id', RIMAE_PROJECT_ID)
       .eq('status', 'open'),
 
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', VCTRL_PROJECT_ID)
+      .eq('project_id', RIMAE_PROJECT_ID)
       .in('severity', ['critical', 'high'])
       .eq('status', 'open'),
 
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', VCTRL_PROJECT_ID)
+      .eq('project_id', RIMAE_PROJECT_ID)
       .eq('status', 'resolved'),
 
     supabase
       .from('events_with_meta')
       .select('id, title, category, severity, status, event_timestamp, source_name, tag_names')
-      .eq('project_id', VCTRL_PROJECT_ID)
+      .eq('project_id', RIMAE_PROJECT_ID)
       .order('event_timestamp', { ascending: false })
       .limit(8),
 
     supabase
       .from('events')
       .select('category')
-      .eq('project_id', VCTRL_PROJECT_ID),
+      .eq('project_id', RIMAE_PROJECT_ID),
 
     supabase
       .from('saved_views')
       .select('id, name, description')
-      .eq('project_id', VCTRL_PROJECT_ID)
+      .eq('project_id', RIMAE_PROJECT_ID)
       .order('created_at'),
   ])
 
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 data-testid="dashboard-heading" className="text-xl font-semibold tracking-tight text-foreground">
-            VCTRL Knowledge Base
+            RIMAE Knowledge Base
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             Project intelligence, decisions, and context — searchable.

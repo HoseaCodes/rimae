@@ -1,4 +1,4 @@
-# ─── VCTRL Playwright E2E ─────────────────────────────────────────────────────
+# ─── RIMAE Playwright E2E ─────────────────────────────────────────────────────
 # Runs on every push and pull request across all branches.
 # Snapshot diffs, videos, and the HTML report are uploaded as artifacts
 # (retained for 30 days) so failures are always reviewable.
@@ -19,6 +19,7 @@ on:
 jobs:
   e2e:
     name: Playwright E2E
+    continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -52,7 +53,6 @@ jobs:
       # playwright.config.ts (see note below), then fall back to the default.
       - name: Run Playwright tests
         run: npm run test:e2e
-        continue-on-error: true
         env:
           CI: true
           # Tell the Playwright config to use `next start` instead of `next dev`

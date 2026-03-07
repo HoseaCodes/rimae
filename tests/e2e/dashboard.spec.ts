@@ -10,7 +10,7 @@ test.describe('Dashboard', () => {
   test('renders the page heading @visual', async ({ page }) => {
     const heading = page.locator('[data-testid="dashboard-heading"]')
     await expect(heading).toBeVisible()
-    await expect(heading).toHaveText('VCTRL Knowledge Base')
+    await expect(heading).toHaveText('RIMAE Knowledge Base')
   })
 
   test('stats grid shows all four cards @visual', async ({ page }) => {

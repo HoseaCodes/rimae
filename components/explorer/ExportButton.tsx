@@ -27,7 +27,7 @@ export function ExportButton({ events }: ExportButtonProps) {
 
   const handleCopy = async () => {
     const NL = String.fromCharCode(10)
-    const header = `VCTRL Export — ${events.length} event${events.length !== 1 ? 's' : ''} — ${new Date().toISOString().split('T')[0]}`
+    const header = `RIMAE Export — ${events.length} event${events.length !== 1 ? 's' : ''} — ${new Date().toISOString().split('T')[0]}`
     const separator = '='.repeat(60)
     const divider = NL + NL + '-'.repeat(40) + NL + NL
     const body = events.map(formatEventForExport).join(divider)
@@ -42,7 +42,7 @@ export function ExportButton({ events }: ExportButtonProps) {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `vctrl-export-${new Date().toISOString().split('T')[0]}.txt`
+      a.download = `rimae-export-${new Date().toISOString().split('T')[0]}.txt`
       a.click()
       URL.revokeObjectURL(url)
     }

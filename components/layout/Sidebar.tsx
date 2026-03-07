@@ -39,7 +39,7 @@ export function Sidebar({ savedViews }: SidebarProps) {
       <div className="flex h-12 items-center gap-2.5 border-b border-border px-4">
         <Activity size={16} className="text-primary" />
         <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-          VCTRL
+          RIMAE
         </span>
         <span className="ml-auto rounded bg-zinc-700 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
           KB
@@ -111,7 +111,7 @@ export function Sidebar({ savedViews }: SidebarProps) {
 
       {/* Footer */}
       <div className="border-t border-border px-4 py-3">
-        <p className="text-[11px] text-sidebar-foreground/40">Project: VCTRL</p>
+        <p className="text-[11px] text-sidebar-foreground/40">Project: RIMAE</p>
       </div>
     </aside>
   )

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { VCTRL_PROJECT_ID } from '@/lib/constants'
+import { RIMAE_PROJECT_ID } from '@/lib/constants'
 import { ExplorerFilters } from '@/components/explorer/ExplorerFilters'
 import { EventsTable } from '@/components/explorer/EventsTable'
 import type { ExplorerEvent } from '@/components/explorer/EventsTable'
@@ -83,7 +83,7 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
       'id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names',
       { count: 'exact' }
     )
-    .eq('project_id', VCTRL_PROJECT_ID)
+    .eq('project_id', RIMAE_PROJECT_ID)
 
   if (effectiveSearch) {
     query = query.textSearch('search_vector', effectiveSearch, {
@@ -135,7 +135,7 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
           <p className="mt-0.5 text-sm text-muted-foreground">
             {activeView
               ? 'Saved view — modify filters to explore further'
-              : 'Search and filter VCTRL project events'}
+              : 'Search and filter RIMAE project events'}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">

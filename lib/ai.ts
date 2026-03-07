@@ -1,4 +1,4 @@
-// ─── VCTRL AI Abstraction Layer ───────────────────────────────────────────
+// ─── RIMAE AI Abstraction Layer ───────────────────────────────────────────
 // Phase 6: Future-ready hooks for LLM-powered features.
 // All functions have working fallbacks today; swap in real LLM calls when ready.
 

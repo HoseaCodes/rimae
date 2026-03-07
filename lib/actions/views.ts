@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { SaveViewSchema } from '@/lib/schemas'
-import { VCTRL_PROJECT_ID } from '@/lib/constants'
+import { RIMAE_PROJECT_ID } from '@/lib/constants'
 import type { ActionResult, SaveViewValues } from '@/lib/schemas'
 
 export async function createSavedViewAction(
@@ -25,7 +25,7 @@ export async function createSavedViewAction(
   const { data: view, error } = await supabase
     .from('saved_views')
     .insert({
-      project_id: VCTRL_PROJECT_ID,
+      project_id: RIMAE_PROJECT_ID,
       name: data.name,
       description: data.description || null,
       filter_state: data.filter_state,

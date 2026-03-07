@@ -14,10 +14,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | VCTRL',
-    default: 'VCTRL Knowledge Base',
+    template: '%s | RIMAE',
+    default: 'RIMAE Knowledge Base',
   },
-  description: 'Splunk-style project intelligence for VCTRL — search, filter, and preserve every decision.',
+  description: 'Splunk-style project intelligence for RIMAE — search, filter, and preserve every decision.',
 }
 
 export default function RootLayout({

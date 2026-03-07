@@ -1,4 +1,4 @@
-// Supabase Edge Function — VCTRL ChatGPT Ingest Pipeline
+// Supabase Edge Function — RIMAE ChatGPT Ingest Pipeline
 // Deploy: supabase functions deploy ingest-chatgpt
 // Secrets: supabase secrets set CHATGPT_INGEST_TOKEN=<your-token>
 
@@ -10,7 +10,7 @@ const CORS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const VCTRL_PROJECT_ID = "a1b2c3d4-0000-0000-0000-000000000001";
+const RIMAE_PROJECT_ID = "a1b2c3d4-0000-0000-0000-000000000001";
 
 interface IngestPayload {
   title: string;
@@ -78,7 +78,7 @@ Deno.serve(async (req: Request) => {
     const { data: source } = await (supabase as any)
       .from("sources")
       .insert({
-        project_id: VCTRL_PROJECT_ID,
+        project_id: RIMAE_PROJECT_ID,
         name: body.source_name ?? "ChatGPT",
         type: "chatgpt_web",
         original_url: body.source_url ?? null,
@@ -101,7 +101,7 @@ Deno.serve(async (req: Request) => {
   const { data: event, error: eventError } = await (supabase as any)
     .from("events")
     .insert({
-      project_id: VCTRL_PROJECT_ID,
+      project_id: RIMAE_PROJECT_ID,
       source_id: sourceId,
       title: body.title.slice(0, 500),
       summary: body.summary?.slice(0, 2000) ?? null,

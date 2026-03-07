@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { goto, matchSnapshot, disableAnimations } from '../helpers/navigation'
 
 const ROUTES = [
-  { path: '/',        label: 'Dashboard',   heading: 'VCTRL Knowledge Base', readyId: 'dashboard-page' },
+  { path: '/',        label: 'Dashboard',   heading: 'RIMAE Knowledge Base', readyId: 'dashboard-page' },
   { path: '/explorer', label: 'Explorer',   heading: 'Event Explorer',       readyId: 'explorer-page' },
   { path: '/ingest',   label: 'Ingest',     heading: null,                    readyId: 'ingest-form' },
   { path: '/views',    label: 'Saved Views', heading: 'Saved Views',          readyId: 'views-page' },

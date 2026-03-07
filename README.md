@@ -1,6 +1,6 @@
-# Vctrl
+# Rimae
 
-Vctrl is a modern event ingestion and exploration dashboard built with Next.js and Supabase. It provides a polished interface for ingesting, searching, filtering, and visualizing event data, plus saved views and integrations for AI-assisted ingestion.
+Rimae is a modern event ingestion and exploration dashboard built with Next.js and Supabase. It provides a polished interface for ingesting, searching, filtering, and visualizing event data, plus saved views and integrations for AI-assisted ingestion.
 
 Key features
 - Clean, responsive UI for event exploration and dashboards

@@ -106,5 +106,5 @@ export const SOURCE_TYPE_OPTIONS: { value: SourceType; label: string }[] = (
 
 // ─── Project ──────────────────────────────────────────────────────────────────
 
-export const VCTRL_PROJECT_ID = 'a1b2c3d4-0000-0000-0000-000000000001'
-export const VCTRL_PROJECT_SLUG = 'vctrl'
+export const RIMAE_PROJECT_ID = 'a1b2c3d4-0000-0000-0000-000000000001'
+export const RIMAE_PROJECT_SLUG = 'rimae'

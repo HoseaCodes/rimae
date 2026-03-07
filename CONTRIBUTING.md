@@ -1,6 +1,6 @@
-# Contributing to Vctrl
+# Contributing to Rimae
 
-Thank you for your interest in contributing to Vctrl! We welcome bug reports, feature requests, documentation improvements, and code contributions.
+Thank you for your interest in contributing to Rimae! We welcome bug reports, feature requests, documentation improvements, and code contributions.
 
 Getting started
 
@@ -52,4 +52,4 @@ Code of Conduct
 
 By participating you agree to follow the project's Code of Conduct. Please be kind and respectful when interacting with maintainers and other contributors.
 
-Thanks for helping improve Vctrl — your contributions make the project better for everyone.
+Thanks for helping improve Rimae — your contributions make the project better for everyone.

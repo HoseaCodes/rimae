@@ -164,7 +164,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           <table className="w-full text-xs">
             <tbody className="divide-y divide-border">
               <MetaRow label="Event ID" value={e.id} mono />
-              <MetaRow label="Project" value="VCTRL" />
+              <MetaRow label="Project" value="RIMAE" />
               <MetaRow
                 label="Event Time"
                 value={format(new Date(e.event_timestamp), 'PPpp')}

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { EventFormSchema } from '@/lib/schemas'
-import { VCTRL_PROJECT_ID } from '@/lib/constants'
+import { RIMAE_PROJECT_ID } from '@/lib/constants'
 import type { ActionResult, EventFormValues } from '@/lib/schemas'
 import type { SourceType } from '@/lib/database.types'
 import { extractiveSummary } from '@/lib/ai'
@@ -64,7 +64,7 @@ async function createSource(values: EventFormValues, supabase: any): Promise<str
   const { data } = await supabase
     .from('sources')
     .insert({
-      project_id: VCTRL_PROJECT_ID,
+      project_id: RIMAE_PROJECT_ID,
       type: (values.source_type as SourceType) ?? 'manual',
       name: values.source_name,
       original_url: values.source_url || null,
@@ -102,7 +102,7 @@ export async function createEventAction(
   const { data: event, error } = await supabase
     .from('events')
     .insert({
-      project_id: VCTRL_PROJECT_ID,
+      project_id: RIMAE_PROJECT_ID,
       source_id: sourceId,
       title: data.title,
       summary: data.summary || extractiveSummary(data.raw_text) || null,

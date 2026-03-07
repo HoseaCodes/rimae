@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'
 import { BookmarkCheck, Filter, Trash2, ArrowRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { VCTRL_PROJECT_ID } from '@/lib/constants'
+import { RIMAE_PROJECT_ID } from '@/lib/constants'
 import { deleteSavedViewAction } from '@/lib/actions/views'
 import type { FilterState } from '@/lib/database.types'
 
@@ -15,7 +15,7 @@ export default async function SavedViewsPage() {
   const { data: views } = await supabase
     .from('saved_views')
     .select('id, name, description, filter_state, created_at')
-    .eq('project_id', VCTRL_PROJECT_ID)
+    .eq('project_id', RIMAE_PROJECT_ID)
     .order('created_at', { ascending: false })
 
   const rows = (views ?? []) as {

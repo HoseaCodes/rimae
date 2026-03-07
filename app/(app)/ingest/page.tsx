@@ -11,7 +11,7 @@ export default function IngestPage() {
           Ingest Event
         </h1>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          Capture a new event into the VCTRL knowledge base.
+          Capture a new event into the RIMAE knowledge base.
         </p>
       </div>
       <IngestEventForm />
