@@ -1,7 +1,5 @@
 import Link from 'next/link'
-import { CATEGORY_LABELS } from '@/lib/constants'
 import type { TopTopic } from '@/lib/observability/types'
-import type { EventCategory } from '@/lib/database.types'
 
 interface TopTopicsPanelProps {
   topics: TopTopic[]
@@ -27,12 +25,12 @@ export function TopTopicsPanel({ topics }: TopTopicsPanelProps) {
       <div className="divide-y divide-border">
         {topics.map((topic, i) => {
           const pct = max > 0 ? Math.round((topic.count / max) * 100) : 0
-          const label = CATEGORY_LABELS[topic.category as EventCategory] ?? topic.category
+          const label = topic.label
 
           return (
             <Link
-              key={topic.category}
-              href={`/explorer?category=${topic.category}`}
+              key={topic.key}
+              href={`/explorer?category=${topic.key}`}
               className="group flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/40"
             >
               <span className="w-4 text-[11px] text-muted-foreground">{i + 1}</span>
