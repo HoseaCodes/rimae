@@ -1,0 +1,302 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - img [ref=e5]
+        - generic [ref=e7]: VCTRL
+        - generic [ref=e8]: KB
+      - navigation [ref=e9]:
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "Dashboard" [ref=e12] [cursor=pointer]:
+              - /url: /
+              - img [ref=e14]
+              - text: Dashboard
+              - img [ref=e19]
+          - listitem [ref=e21]:
+            - link "Explorer" [ref=e22] [cursor=pointer]:
+              - /url: /explorer
+              - img [ref=e24]
+              - text: Explorer
+          - listitem [ref=e27]:
+            - link "Ingest" [ref=e28] [cursor=pointer]:
+              - /url: /ingest
+              - img [ref=e30]
+              - text: Ingest
+          - listitem [ref=e32]:
+            - link "Saved Views" [ref=e33] [cursor=pointer]:
+              - /url: /views
+              - img [ref=e35]
+              - text: Saved Views
+        - generic [ref=e37]:
+          - paragraph [ref=e38]: Quick Views
+          - list [ref=e39]:
+            - listitem [ref=e40]:
+              - link "Auth & OAuth" [ref=e41] [cursor=pointer]:
+                - /url: /explorer?view=e1000000-0000-0000-0000-000000000001
+                - generic [ref=e43]: Auth & OAuth
+            - listitem [ref=e44]:
+              - link "Launch Blockers" [ref=e45] [cursor=pointer]:
+                - /url: /explorer?view=e1000000-0000-0000-0000-000000000002
+                - generic [ref=e47]: Launch Blockers
+            - listitem [ref=e48]:
+              - link "Pricing Decisions" [ref=e49] [cursor=pointer]:
+                - /url: /explorer?view=e1000000-0000-0000-0000-000000000003
+                - generic [ref=e51]: Pricing Decisions
+            - listitem [ref=e52]:
+              - link "Beta Feedback" [ref=e53] [cursor=pointer]:
+                - /url: /explorer?view=e1000000-0000-0000-0000-000000000004
+                - generic [ref=e55]: Beta Feedback
+            - listitem [ref=e56]:
+              - link "Competitor Insights" [ref=e57] [cursor=pointer]:
+                - /url: /explorer?view=e1000000-0000-0000-0000-000000000005
+                - generic [ref=e59]: Competitor Insights
+            - listitem [ref=e60]:
+              - link "App Store Readiness" [ref=e61] [cursor=pointer]:
+                - /url: /explorer?view=e1000000-0000-0000-0000-000000000006
+                - generic [ref=e63]: App Store Readiness
+            - listitem [ref=e64]:
+              - link "Open Critical" [ref=e65] [cursor=pointer]:
+                - /url: /explorer?view=e1000000-0000-0000-0000-000000000007
+                - generic [ref=e67]: Open Critical
+      - paragraph [ref=e69]: "Project: VCTRL"
+    - main [ref=e70]:
+      - generic [ref=e71]:
+        - generic [ref=e72]:
+          - generic [ref=e73]:
+            - heading "VCTRL Knowledge Base" [level=1] [ref=e74]
+            - paragraph [ref=e75]: Project intelligence, decisions, and context — searchable.
+          - generic [ref=e76]:
+            - link "Explorer" [ref=e77] [cursor=pointer]:
+              - /url: /explorer
+              - img [ref=e78]
+              - text: Explorer
+            - link "Ingest Event" [ref=e81] [cursor=pointer]:
+              - /url: /ingest
+              - img [ref=e82]
+              - text: Ingest Event
+        - generic [ref=e84]:
+          - generic [ref=e85]:
+            - paragraph [ref=e86]: Total Events
+            - paragraph [ref=e87]: "19"
+          - generic [ref=e88]:
+            - paragraph [ref=e89]: Open
+            - paragraph [ref=e90]: "14"
+            - paragraph [ref=e91]: requiring attention
+          - generic [ref=e92]:
+            - paragraph [ref=e93]: Critical / High Open
+            - paragraph [ref=e94]: "2"
+            - paragraph [ref=e95]: high priority
+          - generic [ref=e96]:
+            - paragraph [ref=e97]: Resolved
+            - paragraph [ref=e98]: "4"
+            - paragraph [ref=e99]: closed out
+        - generic [ref=e100]:
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - heading "Recent Events" [level=2] [ref=e103]
+              - link "View all" [ref=e104] [cursor=pointer]:
+                - /url: /explorer
+            - table [ref=e106]:
+              - rowgroup [ref=e107]:
+                - row "Event Category Severity Status When" [ref=e108]:
+                  - columnheader "Event" [ref=e109]
+                  - columnheader "Category" [ref=e110]
+                  - columnheader "Severity" [ref=e111]
+                  - columnheader "Status" [ref=e112]
+                  - columnheader "When" [ref=e113]
+              - rowgroup [ref=e114]:
+                - row "E2E Test Event — Playwright Visual Suite General Medium Open 2 minutes ago" [ref=e115]:
+                  - cell "E2E Test Event — Playwright Visual Suite" [ref=e116]:
+                    - link "E2E Test Event — Playwright Visual Suite" [ref=e117] [cursor=pointer]:
+                      - /url: /events/877ce691-6116-44fc-834b-2ef41c280a89
+                  - cell "General" [ref=e118]:
+                    - generic [ref=e119]: General
+                  - cell "Medium" [ref=e120]:
+                    - generic [ref=e121]: Medium
+                  - cell "Open" [ref=e122]:
+                    - generic [ref=e123]: Open
+                  - cell "2 minutes ago" [ref=e124]
+                - row "E2E Test Event — Playwright Visual Suite General Medium Open 5 minutes ago" [ref=e125]:
+                  - cell "E2E Test Event — Playwright Visual Suite" [ref=e126]:
+                    - link "E2E Test Event — Playwright Visual Suite" [ref=e127] [cursor=pointer]:
+                      - /url: /events/fbd1acc2-4735-41a8-9097-0a1f767345d6
+                  - cell "General" [ref=e128]:
+                    - generic [ref=e129]: General
+                  - cell "Medium" [ref=e130]:
+                    - generic [ref=e131]: Medium
+                  - cell "Open" [ref=e132]:
+                    - generic [ref=e133]: Open
+                  - cell "5 minutes ago" [ref=e134]
+                - row "E2E Test Event — Playwright Visual Suite General Medium Open 23 minutes ago" [ref=e135]:
+                  - cell "E2E Test Event — Playwright Visual Suite" [ref=e136]:
+                    - link "E2E Test Event — Playwright Visual Suite" [ref=e137] [cursor=pointer]:
+                      - /url: /events/2f117e16-c946-4f93-8c6f-2c2faad3df15
+                  - cell "General" [ref=e138]:
+                    - generic [ref=e139]: General
+                  - cell "Medium" [ref=e140]:
+                    - generic [ref=e141]: Medium
+                  - cell "Open" [ref=e142]:
+                    - generic [ref=e143]: Open
+                  - cell "23 minutes ago" [ref=e144]
+                - row "E2E Test Event — Playwright Visual Suite General Medium Open 25 minutes ago" [ref=e145]:
+                  - cell "E2E Test Event — Playwright Visual Suite" [ref=e146]:
+                    - link "E2E Test Event — Playwright Visual Suite" [ref=e147] [cursor=pointer]:
+                      - /url: /events/a4575118-4202-4c4a-aa71-7af88bd5d6e3
+                  - cell "General" [ref=e148]:
+                    - generic [ref=e149]: General
+                  - cell "Medium" [ref=e150]:
+                    - generic [ref=e151]: Medium
+                  - cell "Open" [ref=e152]:
+                    - generic [ref=e153]: Open
+                  - cell "25 minutes ago" [ref=e154]
+                - row "E2E Test Event — Playwright Visual Suite General Medium Open 40 minutes ago" [ref=e155]:
+                  - cell "E2E Test Event — Playwright Visual Suite" [ref=e156]:
+                    - link "E2E Test Event — Playwright Visual Suite" [ref=e157] [cursor=pointer]:
+                      - /url: /events/7d2aa34f-7dda-417b-9b66-8ef12de7ee41
+                  - cell "General" [ref=e158]:
+                    - generic [ref=e159]: General
+                  - cell "Medium" [ref=e160]:
+                    - generic [ref=e161]: Medium
+                  - cell "Open" [ref=e162]:
+                    - generic [ref=e163]: Open
+                  - cell "40 minutes ago" [ref=e164]
+                - row "E2E Test Event — Playwright Visual Suite General Medium Open about 1 hour ago" [ref=e165]:
+                  - cell "E2E Test Event — Playwright Visual Suite" [ref=e166]:
+                    - link "E2E Test Event — Playwright Visual Suite" [ref=e167] [cursor=pointer]:
+                      - /url: /events/02fd5fc4-07f7-4e83-8545-fc5af83b881e
+                  - cell "General" [ref=e168]:
+                    - generic [ref=e169]: General
+                  - cell "Medium" [ref=e170]:
+                    - generic [ref=e171]: Medium
+                  - cell "Open" [ref=e172]:
+                    - generic [ref=e173]: Open
+                  - cell "about 1 hour ago" [ref=e174]
+                - row "Rimae Automated Test Suite ChatGPT Chat Log Info Open about 2 hours ago" [ref=e175]:
+                  - cell "Rimae Automated Test Suite ChatGPT" [ref=e176]:
+                    - link "Rimae Automated Test Suite" [ref=e177] [cursor=pointer]:
+                      - /url: /events/30cfd1d3-2ab7-492f-b0f4-66a289524789
+                    - paragraph [ref=e178]: ChatGPT
+                  - cell "Chat Log" [ref=e179]:
+                    - generic [ref=e180]: Chat Log
+                  - cell "Info" [ref=e181]:
+                    - generic [ref=e182]: Info
+                  - cell "Open" [ref=e183]:
+                    - generic [ref=e184]: Open
+                  - cell "about 2 hours ago" [ref=e185]
+                - row "Baby Development Overview ChatGPT Chat Log Info Open about 4 hours ago" [ref=e186]:
+                  - cell "Baby Development Overview ChatGPT" [ref=e187]:
+                    - link "Baby Development Overview" [ref=e188] [cursor=pointer]:
+                      - /url: /events/202f817e-7dbe-4bf3-9252-e9f86d37879b
+                    - paragraph [ref=e189]: ChatGPT
+                  - cell "Chat Log" [ref=e190]:
+                    - generic [ref=e191]: Chat Log
+                  - cell "Info" [ref=e192]:
+                    - generic [ref=e193]: Info
+                  - cell "Open" [ref=e194]:
+                    - generic [ref=e195]: Open
+                  - cell "about 4 hours ago" [ref=e196]
+          - generic [ref=e197]:
+            - heading "By Category" [level=2] [ref=e198]
+            - list [ref=e200]:
+              - listitem [ref=e201]:
+                - link "General 6" [ref=e202] [cursor=pointer]:
+                  - /url: /explorer?category=general
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: General
+                    - generic [ref=e205]: "6"
+              - listitem [ref=e208]:
+                - link "Auth / OAuth 3" [ref=e209] [cursor=pointer]:
+                  - /url: /explorer?category=auth_oauth
+                  - generic [ref=e210]:
+                    - generic [ref=e211]: Auth / OAuth
+                    - generic [ref=e212]: "3"
+              - listitem [ref=e215]:
+                - link "Chat Log 3" [ref=e216] [cursor=pointer]:
+                  - /url: /explorer?category=chat_log
+                  - generic [ref=e217]:
+                    - generic [ref=e218]: Chat Log
+                    - generic [ref=e219]: "3"
+              - listitem [ref=e222]:
+                - link "Beta Feedback 1" [ref=e223] [cursor=pointer]:
+                  - /url: /explorer?category=beta_feedback
+                  - generic [ref=e224]:
+                    - generic [ref=e225]: Beta Feedback
+                    - generic [ref=e226]: "1"
+              - listitem [ref=e229]:
+                - link "Pricing 1" [ref=e230] [cursor=pointer]:
+                  - /url: /explorer?category=pricing
+                  - generic [ref=e231]:
+                    - generic [ref=e232]: Pricing
+                    - generic [ref=e233]: "1"
+              - listitem [ref=e236]:
+                - link "Launch Blocker 1" [ref=e237] [cursor=pointer]:
+                  - /url: /explorer?category=launch_blocker
+                  - generic [ref=e238]:
+                    - generic [ref=e239]: Launch Blocker
+                    - generic [ref=e240]: "1"
+              - listitem [ref=e243]:
+                - link "Competitor Insight 1" [ref=e244] [cursor=pointer]:
+                  - /url: /explorer?category=competitor_insight
+                  - generic [ref=e245]:
+                    - generic [ref=e246]: Competitor Insight
+                    - generic [ref=e247]: "1"
+              - listitem [ref=e250]:
+                - link "App Store 1" [ref=e251] [cursor=pointer]:
+                  - /url: /explorer?category=app_store
+                  - generic [ref=e252]:
+                    - generic [ref=e253]: App Store
+                    - generic [ref=e254]: "1"
+              - listitem [ref=e257]:
+                - link "Roadmap 1" [ref=e258] [cursor=pointer]:
+                  - /url: /explorer?category=roadmap
+                  - generic [ref=e259]:
+                    - generic [ref=e260]: Roadmap
+                    - generic [ref=e261]: "1"
+              - listitem [ref=e264]:
+                - link "Marketing 1" [ref=e265] [cursor=pointer]:
+                  - /url: /explorer?category=marketing
+                  - generic [ref=e266]:
+                    - generic [ref=e267]: Marketing
+                    - generic [ref=e268]: "1"
+        - generic [ref=e271]:
+          - generic [ref=e272]:
+            - heading "Saved Views" [level=2] [ref=e273]
+            - link "Manage views" [ref=e274] [cursor=pointer]:
+              - /url: /views
+          - generic [ref=e275]:
+            - link "Auth & OAuth" [ref=e276] [cursor=pointer]:
+              - /url: /explorer?view=e1000000-0000-0000-0000-000000000001
+              - img [ref=e277]
+              - text: Auth & OAuth
+            - link "Launch Blockers" [ref=e279] [cursor=pointer]:
+              - /url: /explorer?view=e1000000-0000-0000-0000-000000000002
+              - img [ref=e280]
+              - text: Launch Blockers
+            - link "Pricing Decisions" [ref=e282] [cursor=pointer]:
+              - /url: /explorer?view=e1000000-0000-0000-0000-000000000003
+              - img [ref=e283]
+              - text: Pricing Decisions
+            - link "Beta Feedback" [ref=e285] [cursor=pointer]:
+              - /url: /explorer?view=e1000000-0000-0000-0000-000000000004
+              - img [ref=e286]
+              - text: Beta Feedback
+            - link "Competitor Insights" [ref=e288] [cursor=pointer]:
+              - /url: /explorer?view=e1000000-0000-0000-0000-000000000005
+              - img [ref=e289]
+              - text: Competitor Insights
+            - link "App Store Readiness" [ref=e291] [cursor=pointer]:
+              - /url: /explorer?view=e1000000-0000-0000-0000-000000000006
+              - img [ref=e292]
+              - text: App Store Readiness
+            - link "Open Critical" [ref=e294] [cursor=pointer]:
+              - /url: /explorer?view=e1000000-0000-0000-0000-000000000007
+              - img [ref=e295]
+              - text: Open Critical
+  - button "Open Next.js Dev Tools" [ref=e302] [cursor=pointer]:
+    - img [ref=e303]
+  - alert [ref=e306]
+```
