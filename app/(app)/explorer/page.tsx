@@ -8,6 +8,9 @@ import type { ExplorerEvent } from '@/components/explorer/EventsTable'
 import { SaveViewButton } from '@/components/explorer/SaveViewButton'
 import { ExportButton } from '@/components/explorer/ExportButton'
 import type { EventCategory, EventSeverity, EventStatus, SourceType, FilterState, SavedView } from '@/lib/database.types'
+import { getSettings } from '@/lib/actions/settings'
+import { isAIEnabled } from '@/lib/ai'
+import { generateEmbeddingVector } from '@/lib/providers'
 
 export const metadata: Metadata = { title: 'Explorer' }
 export const dynamic = 'force-dynamic'
@@ -36,6 +39,7 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
   const sort = getString(params.sort) || 'event_timestamp'
   const dir = getString(params.dir) || 'desc'
   const viewId = getString(params.view)
+  const mode = getString(params.mode)
 
   // Effective filters (may be overridden by saved view if URL params not set)
   let effectiveSearch = search
@@ -75,54 +79,75 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
   const sortField = VALID_SORT_FIELDS[sort] ?? 'event_timestamp'
   const ascending = dir === 'asc'
 
-  // Build and execute the query
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query: any = supabase
-    .from('events_with_meta')
-    .select(
-      'id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names',
-      { count: 'exact' }
-    )
-    .eq('project_id', RIMAE_PROJECT_ID)
+  const supabaseAny = supabase as any
 
-  if (effectiveSearch) {
-    query = query.textSearch('search_vector', effectiveSearch, {
-      type: 'plain',
-      config: 'english',
-    })
-  }
-  if (effectiveCategory) {
-    query = query.eq('category', effectiveCategory as EventCategory)
-  }
-  if (effectiveSeverity) {
-    query = query.eq('severity', effectiveSeverity as EventSeverity)
-  }
-  if (effectiveStatus) {
-    query = query.eq('status', effectiveStatus as EventStatus)
-  }
-  if (effectiveSourceType) {
-    query = query.eq('source_type', effectiveSourceType as SourceType)
-  }
-  if (effectiveDateFrom) {
-    query = query.gte('event_timestamp', effectiveDateFrom)
-  }
-  if (effectiveDateTo) {
-    // Add one day to make the 'to' date inclusive
-    const toDate = new Date(effectiveDateTo)
-    toDate.setDate(toDate.getDate() + 1)
-    query = query.lt('event_timestamp', toDate.toISOString())
-  }
-  if (effectiveTag) {
-    query = query.contains('tag_names', [effectiveTag])
-  }
+  let events: ExplorerEvent[] = []
+  let totalCount = 0
+  let semanticError: string | null = null
 
-  query = query.order(sortField, { ascending }).limit(100)
+  const isSemantic = mode === 'semantic' && !!effectiveSearch
 
-  const { data: eventsRaw, count: totalCount } = await query
-  const events = (eventsRaw ?? []) as ExplorerEvent[]
+  if (isSemantic) {
+    // Semantic search via pgvector
+    const settings = await getSettings()
+    if (!isAIEnabled(settings)) {
+      semanticError = 'AI is disabled. Enable it in Settings to use semantic search.'
+    } else {
+      try {
+        const embedding = await generateEmbeddingVector(effectiveSearch, settings)
+        const { data: semRaw } = await supabaseAny.rpc('search_events_semantic', {
+          p_project_id: RIMAE_PROJECT_ID,
+          p_embedding: embedding,
+          p_limit: 100,
+        })
+        const semIds = ((semRaw ?? []) as { id: string; similarity: number }[]).map((r) => r.id)
+        if (semIds.length > 0) {
+          const { data: semEvents } = await supabaseAny
+            .from('events_with_meta')
+            .select('id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names')
+            .in('id', semIds)
+          // Preserve similarity order from RPC
+          const byId = Object.fromEntries(((semEvents ?? []) as ExplorerEvent[]).map((e) => [e.id, e]))
+          events = semIds.map((id) => byId[id]).filter(Boolean)
+          totalCount = events.length
+        }
+      } catch (err) {
+        semanticError = err instanceof Error ? err.message : 'Semantic search failed.'
+      }
+    }
+  } else {
+    // Standard keyword + filter query
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query: any = supabase
+      .from('events_with_meta')
+      .select(
+        'id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names',
+        { count: 'exact' }
+      )
+      .eq('project_id', RIMAE_PROJECT_ID)
 
-  const hasFilters = !!(effectiveSearch || effectiveCategory || effectiveSeverity ||
-    effectiveStatus || effectiveSourceType || effectiveDateFrom || effectiveDateTo || effectiveTag)
+    if (effectiveSearch) {
+      query = query.textSearch('search_vector', effectiveSearch, { type: 'plain', config: 'english' })
+    }
+    if (effectiveCategory) query = query.eq('category', effectiveCategory as EventCategory)
+    if (effectiveSeverity) query = query.eq('severity', effectiveSeverity as EventSeverity)
+    if (effectiveStatus) query = query.eq('status', effectiveStatus as EventStatus)
+    if (effectiveSourceType) query = query.eq('source_type', effectiveSourceType as SourceType)
+    if (effectiveDateFrom) query = query.gte('event_timestamp', effectiveDateFrom)
+    if (effectiveDateTo) {
+      const toDate = new Date(effectiveDateTo)
+      toDate.setDate(toDate.getDate() + 1)
+      query = query.lt('event_timestamp', toDate.toISOString())
+    }
+    if (effectiveTag) query = query.contains('tag_names', [effectiveTag])
+
+    query = query.order(sortField, { ascending }).limit(100)
+
+    const { data: eventsRaw, count } = await query
+    events = (eventsRaw ?? []) as ExplorerEvent[]
+    totalCount = count ?? 0
+  }
 
   return (
     <div data-testid="explorer-page" className="mx-auto max-w-6xl space-y-4 px-6 py-6">
@@ -164,12 +189,20 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
           initialTag={effectiveTag}
           initialSort={sortField}
           initialDir={dir}
+          initialMode={mode}
           activeView={activeView}
         />
       </Suspense>
 
+      {/* Semantic error */}
+      {semanticError && (
+        <div className="rounded-md border border-red-500/20 bg-red-500/5 px-4 py-2 text-xs text-red-400">
+          {semanticError}
+        </div>
+      )}
+
       {/* Results */}
-      <EventsTable events={events} totalCount={totalCount ?? 0} />
+      <EventsTable events={events} totalCount={totalCount} />
     </div>
   )
 }

@@ -137,6 +137,28 @@ export interface FilterState {
   sort_dir?: 'asc' | 'desc'
 }
 
+// ─── AI / Settings types ──────────────────────────────────────────────────────
+
+export type AIProvider = 'ollama_local' | 'openai' | 'claude'
+
+export interface AppSettings {
+  ai_enabled: boolean
+  ai_provider: AIProvider
+  ollama_model: string
+  ollama_cloud_model: string
+  openai_model: string
+  claude_model: string
+  temperature: number
+  // Embeddings always use OpenAI text-embedding (1536 dims, matches pgvector column)
+  openai_embedding_model: string
+}
+
+export interface ProjectSettings {
+  project_id: string
+  settings: AppSettings
+  updated_at: string
+}
+
 // ─── Database shape for Supabase JS client (v2) ───────────────────────────────
 // Supabase v2 requires Row/Insert/Update/Relationships on each table.
 
@@ -194,6 +216,12 @@ export interface Database {
           updated_at?: string
         }
         Update: Partial<Omit<SavedView, 'id'>>
+        Relationships: []
+      }
+      project_settings: {
+        Row: ProjectSettings
+        Insert: { project_id: string; settings?: Json; updated_at?: string }
+        Update: { settings?: Json; updated_at?: string }
         Relationships: []
       }
     }

@@ -1,6 +1,47 @@
 // ─── RIMAE AI Abstraction Layer ───────────────────────────────────────────
 // Phase 6: Future-ready hooks for LLM-powered features.
 // All functions have working fallbacks today; swap in real LLM calls when ready.
+//
+// Phase 8 additions: AI guard helpers and provider-dispatch skeleton.
+// Actual LLM calls are still stubs — the provider routing structure is in place.
+
+import type { AppSettings, AIProvider } from '@/lib/database.types'
+
+// ─── AI guard ─────────────────────────────────────────────────────────────────
+
+/**
+ * Returns true only when ai_enabled is explicitly true in settings.
+ * All enrichment actions should call this first.
+ */
+export function isAIEnabled(settings: AppSettings): boolean {
+  return settings.ai_enabled === true
+}
+
+/**
+ * Returns a warning string if the selected provider is missing required env vars.
+ * Never stores secrets — only checks for their presence.
+ */
+export function getProviderEnvWarning(provider: AIProvider): string | null {
+  if (provider === 'openai' && !process.env.OPENAI_API_KEY) {
+    return 'OPENAI_API_KEY is not set. Add it to your .env.local or Vercel environment variables.'
+  }
+  if (provider === 'claude' && !process.env.ANTHROPIC_API_KEY) {
+    return 'ANTHROPIC_API_KEY is not set. Add it to your .env.local or Vercel environment variables.'
+  }
+  return null
+}
+
+/**
+ * Returns a human-readable label for the active provider + model.
+ */
+export function getActiveModelLabel(settings: AppSettings): string {
+  switch (settings.ai_provider) {
+    case 'openai':       return `OpenAI / ${settings.openai_model}`
+    case 'claude':       return `Claude / ${settings.claude_model}`
+    case 'ollama_local': return `Ollama / ${settings.ollama_model}`
+    default:             return 'Unknown provider'
+  }
+}
 
 // ─── Extractive summary ────────────────────────────────────────────
 /**

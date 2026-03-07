@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { Search, X, SlidersHorizontal } from 'lucide-react'
+import { Search, X, SlidersHorizontal, Sparkles } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -39,6 +39,7 @@ interface ExplorerFiltersProps {
   initialTag: string
   initialSort: string
   initialDir: string
+  initialMode: string
   activeView?: ActiveView
 }
 
@@ -59,6 +60,7 @@ export function ExplorerFilters({
   initialTag,
   initialSort,
   initialDir,
+  initialMode,
   activeView,
 }: ExplorerFiltersProps) {
   const router = useRouter()
@@ -144,7 +146,7 @@ export function ExplorerFilters({
             data-testid="search-input"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="Search events..."
+            placeholder={initialMode === 'semantic' ? 'Describe what you\'re looking for…' : 'Search events…'}
             className="h-8 pl-8 text-xs"
           />
           {searchValue && (
@@ -156,6 +158,19 @@ export function ExplorerFilters({
             </button>
           )}
         </div>
+
+        <button
+          title={initialMode === 'semantic' ? 'Semantic search (click for keyword)' : 'Keyword search (click for semantic)'}
+          onClick={() => updateParams({ mode: initialMode === 'semantic' ? null : 'semantic' })}
+          className={`flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-medium transition-colors ${
+            initialMode === 'semantic'
+              ? 'border-primary/40 bg-primary/10 text-primary'
+              : 'border-border bg-transparent text-muted-foreground hover:bg-muted'
+          }`}
+        >
+          <Sparkles size={11} />
+          {initialMode === 'semantic' ? 'Semantic' : 'Keyword'}
+        </button>
 
         <Select value={initialCategory || 'all'} onValueChange={(val) => updateParams({ category: val === 'all' ? null : val })}>
           <SelectTrigger className="h-8 w-40 text-xs">

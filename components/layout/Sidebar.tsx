@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Activity,
   BarChart2,
+  Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SavedView } from '@/lib/database.types'
@@ -26,6 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Ingest', href: '/ingest', icon: <PlusCircle size={15} /> },
   { label: 'Saved Views', href: '/views', icon: <Bookmark size={15} /> },
   { label: 'Observability', href: '/observability', icon: <BarChart2 size={15} /> },
+  { label: 'Settings', href: '/settings', icon: <Settings size={15} /> },
 ]
 
 interface SidebarProps {

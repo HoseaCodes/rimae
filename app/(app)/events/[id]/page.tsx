@@ -17,7 +17,10 @@ import {
   EVENT_TYPE_LABELS,
   SOURCE_TYPE_LABELS,
 } from '@/lib/constants'
-import type { EventWithMeta } from '@/lib/database.types'
+import { getSettings } from '@/lib/actions/settings'
+import { eventQualityScore, isAIEnabled, getActiveModelLabel } from '@/lib/ai'
+import { IntelligencePanel } from '@/components/intelligence/IntelligencePanel'
+import type { EventWithMeta, EventSeverity, EventStatus, EventCategory } from '@/lib/database.types'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -52,6 +55,34 @@ export default async function EventDetailPage({ params }: PageProps) {
   }
 
   const e = event as EventWithMeta
+
+  const settings = await getSettings()
+  const aiEnabled = isAIEnabled(settings)
+  const qualityScore = eventQualityScore({
+    title: e.title,
+    summary: e.summary,
+    raw_text: e.raw_text,
+    tag_names: e.tag_names,
+    source_name: e.source_name,
+  })
+  const modelLabel = getActiveModelLabel(settings)
+
+  // Related events via pgvector similarity (only if this event has an embedding)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabaseAny = supabase as any
+  const { data: relatedRaw } = await supabaseAny.rpc('find_related_events', {
+    p_event_id: e.id,
+    p_project_id: e.project_id,
+    p_limit: 5,
+  })
+  const relatedIds = ((relatedRaw ?? []) as { id: string; similarity: number }[])
+  const relatedEvents = relatedIds.length
+    ? ((await supabaseAny
+        .from('events_with_meta')
+        .select('id, title, category, severity, status')
+        .in('id', relatedIds.map((r) => r.id))
+      ).data ?? []) as { id: string; title: string; category: EventCategory; severity: EventSeverity; status: EventStatus }[]
+    : []
 
   return (
     <div data-testid="event-detail-page" className="mx-auto max-w-4xl space-y-6 px-6 py-6">
@@ -191,15 +222,44 @@ export default async function EventDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* Related events placeholder */}
+      {/* Intelligence panel */}
       <section className="space-y-2">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Related Events
+          Intelligence
         </h2>
-        <p className="text-xs text-muted-foreground/60">
-          Related event discovery will be added in a future phase (semantic search via pgvector).
-        </p>
+        <IntelligencePanel
+          eventId={e.id}
+          currentCategory={e.category}
+          aiEnabled={aiEnabled}
+          qualityScore={qualityScore}
+          modelLabel={modelLabel}
+        />
       </section>
+
+      {/* Related events */}
+      {relatedEvents.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Related Events
+          </h2>
+          <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+            {relatedEvents.map((rel) => (
+              <Link
+                key={rel.id}
+                href={`/events/${rel.id}`}
+                className="flex items-center justify-between gap-4 px-3 py-2.5 text-sm transition-colors hover:bg-muted/40"
+              >
+                <span className="min-w-0 flex-1 truncate text-foreground/85">{rel.title}</span>
+                <div className="flex flex-shrink-0 items-center gap-1.5">
+                  <SeverityBadge severity={rel.severity} />
+                  <StatusBadge status={rel.status} />
+                  <CategoryBadge category={rel.category} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
