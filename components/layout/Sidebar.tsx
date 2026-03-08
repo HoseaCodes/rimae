@@ -16,6 +16,7 @@ import {
   LayoutGrid,
   FolderKanban,
   Globe2,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { SavedView, Project } from '@/lib/database.types'
@@ -30,6 +31,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard',    href: '/',             icon: <LayoutDashboard size={15} /> },
   { label: 'Explorer',     href: '/explorer',     icon: <Search size={15} /> },
+  { label: 'Copilot',      href: '/copilot',      icon: <Sparkles size={15} /> },
   { label: 'Ingest',       href: '/ingest',       icon: <PlusCircle size={15} /> },
   { label: 'Workflow',     href: '/workflow',     icon: <Layers size={15} /> },
   { label: 'Launch',       href: '/launch',       icon: <Rocket size={15} /> },
