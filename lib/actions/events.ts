@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { EventFormSchema } from '@/lib/schemas'
-import { RIMAE_PROJECT_ID } from '@/lib/constants'
+import { getActiveProjectId } from '@/lib/project-context'
 import type { ActionResult, EventFormValues } from '@/lib/schemas'
 import type { SourceType } from '@/lib/database.types'
 import { extractiveSummary } from '@/lib/ai'
@@ -58,13 +58,13 @@ async function applyTags(eventId: string, tagsRaw: string | undefined, supabase:
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function createSource(values: EventFormValues, supabase: any): Promise<string | null> {
+async function createSource(values: EventFormValues, supabase: any, projectId: string): Promise<string | null> {
   if (!values.source_name) return null
 
   const { data } = await supabase
     .from('sources')
     .insert({
-      project_id: RIMAE_PROJECT_ID,
+      project_id: projectId,
       type: (values.source_type as SourceType) ?? 'manual',
       name: values.source_name,
       original_url: values.source_url || null,
@@ -94,15 +94,16 @@ export async function createEventAction(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = await createClient() as any
   const data = parsed.data
+  const projectId = await getActiveProjectId()
 
   // Create source if provided
-  const sourceId = await createSource(data, supabase)
+  const sourceId = await createSource(data, supabase, projectId)
 
   // Insert event
   const { data: event, error } = await supabase
     .from('events')
     .insert({
-      project_id: RIMAE_PROJECT_ID,
+      project_id: projectId,
       source_id: sourceId,
       title: data.title,
       summary: data.summary || extractiveSummary(data.raw_text) || null,

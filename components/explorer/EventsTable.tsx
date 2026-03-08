@@ -18,14 +18,18 @@ export type ExplorerEvent = {
   source_name: string | null
   source_type: SourceType | null
   tag_names: string[]
+  project_id?: string
 }
 
 interface EventsTableProps {
   events: ExplorerEvent[]
   totalCount: number
+  /** When provided, shows a project column. Keys are project IDs, values are project names. */
+  projectsMap?: Record<string, string>
 }
 
-export function EventsTable({ events, totalCount }: EventsTableProps) {
+export function EventsTable({ events, totalCount, projectsMap }: EventsTableProps) {
+  const showProject = !!projectsMap && Object.keys(projectsMap).length > 1
   if (events.length === 0) {
     return (
       <div data-testid="events-table-empty" className="flex min-h-48 flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border text-center">
@@ -50,6 +54,11 @@ export function EventsTable({ events, totalCount }: EventsTableProps) {
               <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">
                 Event
               </th>
+              {showProject && (
+                <th className="hidden px-3 py-2 text-left text-xs font-medium text-muted-foreground sm:table-cell">
+                  Project
+                </th>
+              )}
               <th className="hidden px-3 py-2 text-left text-xs font-medium text-muted-foreground sm:table-cell">
                 Type
               </th>
@@ -96,6 +105,13 @@ export function EventsTable({ events, totalCount }: EventsTableProps) {
                     </p>
                   )}
                 </td>
+                {showProject && (
+                  <td className="hidden px-3 py-2.5 sm:table-cell">
+                    <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-400">
+                      {(event.project_id && projectsMap?.[event.project_id]) ?? '—'}
+                    </span>
+                  </td>
+                )}
                 <td className="hidden px-3 py-2.5 sm:table-cell">
                   <span className="text-xs text-muted-foreground">
                     {EVENT_TYPE_LABELS[event.event_type]}

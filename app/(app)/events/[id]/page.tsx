@@ -8,6 +8,7 @@ import {
   ExternalLink,
   Calendar,
   Tag,
+  ListTodo,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { SeverityBadge } from '@/components/shared/SeverityBadge'
@@ -20,6 +21,10 @@ import {
 import { getSettings } from '@/lib/actions/settings'
 import { eventQualityScore, isAIEnabled, getActiveModelLabel } from '@/lib/ai'
 import { IntelligencePanel } from '@/components/intelligence/IntelligencePanel'
+import { PinButton } from '@/components/workflow/PinButton'
+import { FollowUpForm } from '@/components/workflow/FollowUpForm'
+import { FollowUpList } from '@/components/workflow/FollowUpList'
+import { isEventPinned, getFollowUpsForEvent } from '@/lib/workflow/queries'
 import type { EventWithMeta, EventSeverity, EventStatus, EventCategory } from '@/lib/database.types'
 
 interface PageProps {
@@ -56,7 +61,12 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const e = event as EventWithMeta
 
-  const settings = await getSettings()
+  // Workflow data — run in parallel with AI/related queries
+  const [settings, isPinned, followUps] = await Promise.all([
+    getSettings(),
+    isEventPinned(e.id),
+    getFollowUpsForEvent(e.id),
+  ])
   const aiEnabled = isAIEnabled(settings)
   const qualityScore = eventQualityScore({
     title: e.title,
@@ -101,12 +111,15 @@ export default async function EventDetailPage({ params }: PageProps) {
           <h1 data-testid="event-title" className="text-xl font-semibold leading-snug tracking-tight text-foreground">
             {e.title}
           </h1>
-          <Link
-            href={`/events/${e.id}/edit`}
-            className="flex-shrink-0 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:bg-card/80 hover:text-foreground"
-          >
-            Edit
-          </Link>
+          <div className="flex flex-shrink-0 items-center gap-2">
+            <PinButton eventId={e.id} isPinned={isPinned} />
+            <Link
+              href={`/events/${e.id}/edit`}
+              className="rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground/70 transition-colors hover:bg-card/80 hover:text-foreground"
+            >
+              Edit
+            </Link>
+          </div>
         </div>
 
         {/* Badge row */}
@@ -219,6 +232,23 @@ export default async function EventDetailPage({ params }: PageProps) {
               )}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* Follow-ups */}
+      <section className="space-y-2">
+        <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <ListTodo size={11} />
+          Follow-ups
+          {followUps.length > 0 && (
+            <span className="ml-1 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+              {followUps.length}
+            </span>
+          )}
+        </h2>
+        <div className="space-y-2">
+          <FollowUpList followUps={followUps} />
+          <FollowUpForm eventId={e.id} />
         </div>
       </section>
 

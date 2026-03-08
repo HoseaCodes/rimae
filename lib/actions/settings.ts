@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import { RIMAE_PROJECT_ID } from '@/lib/constants'
+import { getActiveProjectId } from '@/lib/project-context'
 import type { AppSettings } from '@/lib/database.types'
 
 // ─── Defaults ────────────────────────────────────────────────────────────────
@@ -24,10 +24,11 @@ const DEFAULT_SETTINGS: AppSettings = {
 export async function getSettings(): Promise<AppSettings> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = await createClient() as any
+  const projectId = await getActiveProjectId()
   const { data } = await supabase
     .from('project_settings')
     .select('settings')
-    .eq('project_id', RIMAE_PROJECT_ID)
+    .eq('project_id', projectId)
     .single()
 
   if (!data) return { ...DEFAULT_SETTINGS }
@@ -39,7 +40,7 @@ export async function getSettings(): Promise<AppSettings> {
 export async function updateSettingsAction(
   patch: Partial<AppSettings>
 ): Promise<{ success: boolean; error?: string }> {
-  const current = await getSettings()
+  const [current, projectId] = await Promise.all([getSettings(), getActiveProjectId()])
   const merged: AppSettings = { ...current, ...patch }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,7 +48,7 @@ export async function updateSettingsAction(
   const { error } = await supabase
     .from('project_settings')
     .upsert(
-      { project_id: RIMAE_PROJECT_ID, settings: merged },
+      { project_id: projectId, settings: merged },
       { onConflict: 'project_id' }
     )
 

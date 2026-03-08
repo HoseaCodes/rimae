@@ -104,12 +104,15 @@ export interface EventTag {
   tag_id: string
 }
 
+export type SavedViewScope = 'project' | 'global'
+
 export interface SavedView {
   id: string
   project_id: string
   name: string
   description: string | null
   filter_state: Json
+  scope: SavedViewScope
   created_at: string
   updated_at: string
 }
@@ -156,6 +159,96 @@ export interface AppSettings {
 export interface ProjectSettings {
   project_id: string
   settings: AppSettings
+  updated_at: string
+}
+
+// ─── Workflow types ───────────────────────────────────────────────────────────
+
+export type FollowUpStatus =
+  | 'backlog'
+  | 'ready'
+  | 'in_progress'
+  | 'in_review'
+  | 'blocked'
+  | 'done'
+
+export type FollowUpPriority = 'low' | 'medium' | 'high' | 'urgent'
+
+export type ChecklistItemStatus = 'backlog' | 'in_progress' | 'blocked' | 'done'
+
+export type ActionBoardLayout = 'list' | 'board' | 'checklist'
+
+export interface FollowUp {
+  id: string
+  event_id: string
+  title: string
+  description: string | null
+  assignee: string | null
+  priority: FollowUpPriority
+  status: FollowUpStatus
+  due_date: string | null
+  needs_decision: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface FollowUpWithEvent extends FollowUp {
+  event_title: string
+  event_category: EventCategory
+  event_severity: EventSeverity
+  event_status: EventStatus
+}
+
+export interface EventPin {
+  id: string
+  event_id: string
+  created_at: string
+}
+
+// ─── Multi-project types ──────────────────────────────────────────────────────
+
+export type MembershipRole = 'owner' | 'editor' | 'viewer'
+
+export interface ProjectMembership {
+  id: string
+  project_id: string
+  user_id: string
+  role: MembershipRole
+  created_at: string
+  updated_at: string
+}
+
+export interface LaunchChecklist {
+  id: string
+  project_id: string | null
+  name: string
+  description: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface LaunchChecklistItem {
+  id: string
+  checklist_id: string
+  event_id: string | null
+  title: string
+  description: string | null
+  owner: string | null
+  status: ChecklistItemStatus
+  due_date: string | null
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface ActionBoard {
+  id: string
+  project_id: string | null
+  name: string
+  description: string | null
+  filter_state: Json
+  layout_type: ActionBoardLayout
+  created_at: string
   updated_at: string
 }
 
@@ -212,6 +305,7 @@ export interface Database {
           id?: string
           description?: string | null
           filter_state?: Json
+          scope?: SavedViewScope
           created_at?: string
           updated_at?: string
         }
@@ -224,10 +318,65 @@ export interface Database {
         Update: { settings?: Json; updated_at?: string }
         Relationships: []
       }
+      follow_ups: {
+        Row: FollowUp
+        Insert: Omit<FollowUp, 'id' | 'created_at' | 'updated_at'> & {
+          id?: string; description?: string | null; assignee?: string | null
+          priority?: FollowUpPriority; status?: FollowUpStatus; due_date?: string | null
+          needs_decision?: boolean; created_at?: string; updated_at?: string
+        }
+        Update: Partial<Omit<FollowUp, 'id'>>
+        Relationships: []
+      }
+      event_pins: {
+        Row: EventPin
+        Insert: Omit<EventPin, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<EventPin, 'id'>>
+        Relationships: []
+      }
+      launch_checklists: {
+        Row: LaunchChecklist
+        Insert: Omit<LaunchChecklist, 'id' | 'created_at' | 'updated_at'> & {
+          id?: string; description?: string | null; created_at?: string; updated_at?: string
+        }
+        Update: Partial<Omit<LaunchChecklist, 'id'>>
+        Relationships: []
+      }
+      launch_checklist_items: {
+        Row: LaunchChecklistItem
+        Insert: Omit<LaunchChecklistItem, 'id' | 'created_at' | 'updated_at'> & {
+          id?: string; description?: string | null; owner?: string | null
+          event_id?: string | null; status?: ChecklistItemStatus; due_date?: string | null
+          sort_order?: number; created_at?: string; updated_at?: string
+        }
+        Update: Partial<Omit<LaunchChecklistItem, 'id'>>
+        Relationships: []
+      }
+      action_boards: {
+        Row: ActionBoard
+        Insert: Omit<ActionBoard, 'id' | 'created_at' | 'updated_at'> & {
+          id?: string; project_id?: string | null; description?: string | null; filter_state?: Json
+          layout_type?: ActionBoardLayout; created_at?: string; updated_at?: string
+        }
+        Update: Partial<Omit<ActionBoard, 'id'>>
+        Relationships: []
+      }
+      project_memberships: {
+        Row: ProjectMembership
+        Insert: Omit<ProjectMembership, 'id' | 'created_at' | 'updated_at'> & {
+          id?: string; role?: MembershipRole; created_at?: string; updated_at?: string
+        }
+        Update: Partial<Omit<ProjectMembership, 'id'>>
+        Relationships: []
+      }
     }
     Views: {
       events_with_meta: {
         Row: EventWithMeta
+        Relationships: []
+      }
+      follow_ups_with_event: {
+        Row: FollowUpWithEvent
         Relationships: []
       }
     }

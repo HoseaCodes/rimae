@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { RIMAE_PROJECT_ID } from '@/lib/constants'
+import { getActiveProjectId } from '@/lib/project-context'
 import {
   buildChartDatasets,
   buildTimeline,
@@ -14,6 +14,7 @@ import type { Event, EventCategory, EventSeverity, EventStatus } from '@/lib/dat
 
 export async function fetchObservabilityData() {
   const supabase = await createClient()
+  const projectId = await getActiveProjectId()
 
   const [events90dResult, allEventsResult, timelineResult, blockersResult] =
     await Promise.all([
@@ -21,7 +22,7 @@ export async function fetchObservabilityData() {
       supabase
         .from('events')
         .select('event_timestamp, category, severity')
-        .eq('project_id', RIMAE_PROJECT_ID)
+        .eq('project_id', projectId)
         .gte('event_timestamp', nDaysAgo(90))
         .order('event_timestamp', { ascending: true }),
 
@@ -29,13 +30,13 @@ export async function fetchObservabilityData() {
       supabase
         .from('events')
         .select('status')
-        .eq('project_id', RIMAE_PROJECT_ID),
+        .eq('project_id', projectId),
 
       // Timeline: last 30 days, full event fields
       supabase
         .from('events')
         .select('id, title, category, severity, status, event_timestamp, summary')
-        .eq('project_id', RIMAE_PROJECT_ID)
+        .eq('project_id', projectId)
         .gte('event_timestamp', nDaysAgo(30))
         .order('event_timestamp', { ascending: false })
         .limit(60),
@@ -44,7 +45,7 @@ export async function fetchObservabilityData() {
       supabase
         .from('events')
         .select('id, title, category, severity, status, event_timestamp, summary')
-        .eq('project_id', RIMAE_PROJECT_ID)
+        .eq('project_id', projectId)
         .or(
           `category.eq.launch_blocker,severity.eq.critical,event_type.eq.blocker`
         )

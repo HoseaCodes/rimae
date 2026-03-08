@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
-import { RIMAE_PROJECT_ID } from '@/lib/constants'
+import { getActiveProjectId } from '@/lib/project-context'
+import { getProjects } from '@/lib/projects/queries'
 import { ExplorerFilters } from '@/components/explorer/ExplorerFilters'
 import { EventsTable } from '@/components/explorer/EventsTable'
 import type { ExplorerEvent } from '@/components/explorer/EventsTable'
@@ -26,6 +27,7 @@ function getString(val: string | string[] | undefined): string {
 export default async function ExplorerPage({ searchParams }: PageProps) {
   const params = await searchParams
   const supabase = await createClient()
+  const projectId = await getActiveProjectId()
 
   // Parse URL params
   const search = getString(params.q)
@@ -40,6 +42,8 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
   const dir = getString(params.dir) || 'desc'
   const viewId = getString(params.view)
   const mode = getString(params.mode)
+  const scope = getString(params.scope) // 'all' = cross-project search
+  const isAllProjects = scope === 'all'
 
   // Effective filters (may be overridden by saved view if URL params not set)
   let effectiveSearch = search
@@ -85,11 +89,18 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
   let events: ExplorerEvent[] = []
   let totalCount = 0
   let semanticError: string | null = null
+  let projectsMap: Record<string, string> = {}
+
+  // Load projects map for cross-project mode
+  if (isAllProjects) {
+    const allProjects = await getProjects()
+    projectsMap = Object.fromEntries(allProjects.map((p) => [p.id, p.name]))
+  }
 
   const isSemantic = mode === 'semantic' && !!effectiveSearch
 
   if (isSemantic) {
-    // Semantic search via pgvector
+    // Semantic search via pgvector — scoped to active project only
     const settings = await getSettings()
     if (!isAIEnabled(settings)) {
       semanticError = 'AI is disabled. Enable it in Settings to use semantic search.'
@@ -97,7 +108,7 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
       try {
         const embedding = await generateEmbeddingVector(effectiveSearch, settings)
         const { data: semRaw } = await supabaseAny.rpc('search_events_semantic', {
-          p_project_id: RIMAE_PROJECT_ID,
+          p_project_id: projectId,
           p_embedding: embedding,
           p_limit: 100,
         })
@@ -105,9 +116,8 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
         if (semIds.length > 0) {
           const { data: semEvents } = await supabaseAny
             .from('events_with_meta')
-            .select('id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names')
+            .select('id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names, project_id')
             .in('id', semIds)
-          // Preserve similarity order from RPC
           const byId = Object.fromEntries(((semEvents ?? []) as ExplorerEvent[]).map((e) => [e.id, e]))
           events = semIds.map((id) => byId[id]).filter(Boolean)
           totalCount = events.length
@@ -122,10 +132,14 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
     let query: any = supabase
       .from('events_with_meta')
       .select(
-        'id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names',
+        'id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names, project_id',
         { count: 'exact' }
       )
-      .eq('project_id', RIMAE_PROJECT_ID)
+
+    // Scope: active project (default) or all projects
+    if (!isAllProjects) {
+      query = query.eq('project_id', projectId)
+    }
 
     if (effectiveSearch) {
       query = query.textSearch('search_vector', effectiveSearch, { type: 'plain', config: 'english' })
@@ -158,9 +172,11 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
             {activeView ? activeView.name : 'Event Explorer'}
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            {activeView
-              ? 'Saved view — modify filters to explore further'
-              : 'Search and filter RIMAE project events'}
+            {isAllProjects
+              ? 'Searching across all projects'
+              : activeView
+                ? 'Saved view — modify filters to explore further'
+                : 'Search and filter project events'}
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -201,8 +217,20 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
         </div>
       )}
 
+      {/* Cross-project scope toggle */}
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        {isAllProjects ? (
+          <>
+            <span className="rounded border border-primary/30 bg-primary/10 px-1.5 py-0.5 text-primary">All Projects</span>
+            <a href="/explorer" className="hover:text-foreground">Switch to current project</a>
+          </>
+        ) : (
+          <a href="/explorer?scope=all" className="hover:text-foreground">Search across all projects →</a>
+        )}
+      </div>
+
       {/* Results */}
-      <EventsTable events={events} totalCount={totalCount} />
+      <EventsTable events={events} totalCount={totalCount} projectsMap={isAllProjects ? projectsMap : undefined} />
     </div>
   )
 }

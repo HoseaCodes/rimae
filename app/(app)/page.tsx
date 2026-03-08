@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PlusCircle, Search } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { RIMAE_PROJECT_ID } from '@/lib/constants'
+import { getActiveProjectId, getActiveProject } from '@/lib/project-context'
 import { StatsGrid } from '@/components/dashboard/StatsGrid'
 import { RecentEvents } from '@/components/dashboard/RecentEvents'
 import { CategoryBreakdown } from '@/components/dashboard/CategoryBreakdown'
 import { SavedViewsList } from '@/components/dashboard/SavedViewsList'
+import { WorkflowSummaryCards } from '@/components/dashboard/WorkflowSummaryCards'
+import { getWorkflowSummaryCounts, getPinnedEvents } from '@/lib/workflow/queries'
 import type { EventCategory, EventWithMeta, SavedView } from '@/lib/database.types'
 
 export const metadata: Metadata = { title: 'Dashboard' }
@@ -16,6 +18,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
+  const projectId = await getActiveProjectId()
 
   // All queries in parallel for performance
   const [
@@ -30,44 +33,51 @@ export default async function DashboardPage() {
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', RIMAE_PROJECT_ID),
+      .eq('project_id', projectId),
 
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', RIMAE_PROJECT_ID)
+      .eq('project_id', projectId)
       .eq('status', 'open'),
 
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', RIMAE_PROJECT_ID)
+      .eq('project_id', projectId)
       .in('severity', ['critical', 'high'])
       .eq('status', 'open'),
 
     supabase
       .from('events')
       .select('*', { count: 'exact', head: true })
-      .eq('project_id', RIMAE_PROJECT_ID)
+      .eq('project_id', projectId)
       .eq('status', 'resolved'),
 
     supabase
       .from('events_with_meta')
       .select('id, title, category, severity, status, event_timestamp, source_name, tag_names')
-      .eq('project_id', RIMAE_PROJECT_ID)
+      .eq('project_id', projectId)
       .order('event_timestamp', { ascending: false })
       .limit(8),
 
     supabase
       .from('events')
       .select('category')
-      .eq('project_id', RIMAE_PROJECT_ID),
+      .eq('project_id', projectId),
 
     supabase
       .from('saved_views')
       .select('id, name, description')
-      .eq('project_id', RIMAE_PROJECT_ID)
+      .eq('project_id', projectId)
       .order('created_at'),
+  ])
+
+  // Workflow summary + active project name — separate from Supabase tuple
+  const [workflowCounts, pinnedEvents, activeProject] = await Promise.all([
+    getWorkflowSummaryCounts(),
+    getPinnedEvents(),
+    getActiveProject(),
   ])
 
   const totalEvents = totalResult.count ?? 0
@@ -99,7 +109,7 @@ export default async function DashboardPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 data-testid="dashboard-heading" className="text-xl font-semibold tracking-tight text-foreground">
-            RIMAE Knowledge Base
+            {activeProject?.name ?? 'RIMAE'} Knowledge Base
           </h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             Project intelligence, decisions, and context — searchable.
@@ -162,6 +172,41 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Workflow summary */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-foreground">Workflow</h2>
+          <Link href="/workflow" className="text-xs text-muted-foreground hover:text-foreground">
+            View queues
+          </Link>
+        </div>
+        <WorkflowSummaryCards
+          openFollowUps={workflowCounts.openFollowUps}
+          blockedFollowUps={workflowCounts.blockedFollowUps}
+          needsDecision={workflowCounts.needsDecision}
+          pinnedEvents={workflowCounts.pinnedEvents}
+        />
+      </div>
+
+      {/* Pinned events */}
+      {pinnedEvents.length > 0 && (
+        <div id="pinned" className="space-y-2">
+          <h2 className="text-sm font-semibold text-foreground">Pinned Events</h2>
+          <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+            {pinnedEvents.map((ev) => (
+              <Link
+                key={ev.id}
+                href={`/events/${ev.id}`}
+                className="flex items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-muted/40"
+              >
+                <span className="min-w-0 flex-1 truncate text-foreground/85">{ev.title}</span>
+                <span className="flex-shrink-0 text-[11px] text-amber-400">Pinned</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Saved views */}
       <div data-testid="saved-views-section" className="space-y-2">

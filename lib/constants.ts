@@ -1,4 +1,4 @@
-import type { EventCategory, EventSeverity, EventStatus, EventType, SourceType } from '@/lib/database.types'
+import type { EventCategory, EventSeverity, EventStatus, EventType, SourceType, FollowUpStatus, FollowUpPriority, ChecklistItemStatus } from '@/lib/database.types'
 
 // ─── Category ─────────────────────────────────────────────────────────────────
 
@@ -103,6 +103,70 @@ export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
 export const SOURCE_TYPE_OPTIONS: { value: SourceType; label: string }[] = (
   Object.entries(SOURCE_TYPE_LABELS) as [SourceType, string][]
 ).map(([value, label]) => ({ value, label }))
+
+// ─── Follow-up status ─────────────────────────────────────────────────────────
+
+export const FOLLOW_UP_STATUS_LABELS: Record<FollowUpStatus, string> = {
+  backlog:    'Backlog',
+  ready:      'Ready',
+  in_progress:'In Progress',
+  in_review:  'In Review',
+  blocked:    'Blocked',
+  done:       'Done',
+}
+
+export const FOLLOW_UP_STATUS_OPTIONS: { value: FollowUpStatus; label: string }[] = (
+  Object.entries(FOLLOW_UP_STATUS_LABELS) as [FollowUpStatus, string][]
+).map(([value, label]) => ({ value, label }))
+
+export const FOLLOW_UP_STATUS_STYLES: Record<FollowUpStatus, string> = {
+  backlog:    'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+  ready:      'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  in_progress:'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
+  in_review:  'bg-purple-500/15 text-purple-400 border-purple-500/30',
+  blocked:    'bg-red-500/15 text-red-400 border-red-500/30',
+  done:       'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+}
+
+// ─── Follow-up priority ───────────────────────────────────────────────────────
+
+export const FOLLOW_UP_PRIORITY_LABELS: Record<FollowUpPriority, string> = {
+  low:    'Low',
+  medium: 'Medium',
+  high:   'High',
+  urgent: 'Urgent',
+}
+
+export const FOLLOW_UP_PRIORITY_OPTIONS: { value: FollowUpPriority; label: string }[] = (
+  Object.entries(FOLLOW_UP_PRIORITY_LABELS) as [FollowUpPriority, string][]
+).map(([value, label]) => ({ value, label }))
+
+export const FOLLOW_UP_PRIORITY_STYLES: Record<FollowUpPriority, string> = {
+  low:    'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+  medium: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+  high:   'bg-orange-500/15 text-orange-400 border-orange-500/30',
+  urgent: 'bg-red-500/15 text-red-400 border-red-500/30',
+}
+
+// ─── Checklist item status ─────────────────────────────────────────────────────
+
+export const CHECKLIST_ITEM_STATUS_LABELS: Record<ChecklistItemStatus, string> = {
+  backlog:    'Backlog',
+  in_progress:'In Progress',
+  blocked:    'Blocked',
+  done:       'Done',
+}
+
+export const CHECKLIST_ITEM_STATUS_OPTIONS: { value: ChecklistItemStatus; label: string }[] = (
+  Object.entries(CHECKLIST_ITEM_STATUS_LABELS) as [ChecklistItemStatus, string][]
+).map(([value, label]) => ({ value, label }))
+
+export const CHECKLIST_ITEM_STATUS_STYLES: Record<ChecklistItemStatus, string> = {
+  backlog:    'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+  in_progress:'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
+  blocked:    'bg-red-500/15 text-red-400 border-red-500/30',
+  done:       'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+}
 
 // ─── Project ──────────────────────────────────────────────────────────────────
 

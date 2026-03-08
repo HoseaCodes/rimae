@@ -1,6 +1,7 @@
 import { AppShell } from '@/components/layout/AppShell'
 import { createClient } from '@/lib/supabase/server'
-import { RIMAE_PROJECT_ID } from '@/lib/constants'
+import { getActiveProjectId, getActiveProject } from '@/lib/project-context'
+import { getProjects } from '@/lib/projects/queries'
 
 export default async function AppLayout({
   children,
@@ -8,15 +9,25 @@ export default async function AppLayout({
   children: React.ReactNode
 }) {
   const supabase = await createClient()
+  const projectId = await getActiveProjectId()
 
-  const { data: savedViews } = await supabase
-    .from('saved_views')
-    .select('id, name')
-    .eq('project_id', RIMAE_PROJECT_ID)
-    .order('created_at')
+  // Load all data needed for the shell in parallel
+  const [activeProject, projects, savedViewsResult] = await Promise.all([
+    getActiveProject(),
+    getProjects(),
+    supabase
+      .from('saved_views')
+      .select('id, name')
+      .eq('project_id', projectId)
+      .order('created_at'),
+  ])
 
   return (
-    <AppShell savedViews={savedViews ?? []}>
+    <AppShell
+      savedViews={savedViewsResult.data ?? []}
+      projects={projects}
+      activeProject={activeProject}
+    >
       {children}
     </AppShell>
   )

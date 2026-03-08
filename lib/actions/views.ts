@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { SaveViewSchema } from '@/lib/schemas'
-import { RIMAE_PROJECT_ID } from '@/lib/constants'
+import { getActiveProjectId } from '@/lib/project-context'
 import type { ActionResult, SaveViewValues } from '@/lib/schemas'
 
 export async function createSavedViewAction(
@@ -21,11 +21,12 @@ export async function createSavedViewAction(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = await createClient() as any
   const data = parsed.data
+  const projectId = await getActiveProjectId()
 
   const { data: view, error } = await supabase
     .from('saved_views')
     .insert({
-      project_id: RIMAE_PROJECT_ID,
+      project_id: projectId,
       name: data.name,
       description: data.description || null,
       filter_state: data.filter_state,
