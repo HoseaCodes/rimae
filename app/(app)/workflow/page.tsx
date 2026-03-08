@@ -126,7 +126,9 @@ export default async function WorkflowPage({ searchParams }: PageProps) {
                       <div className="flex items-center gap-1.5">
                         <span className="truncate font-medium text-foreground/90">{fu.title}</span>
                         {fu.needs_decision && (
-                          <AlertCircle size={11} className="flex-shrink-0 text-purple-400" title="Needs decision" />
+                          <span title="Needs decision">
+                            <AlertCircle size={11} className="flex-shrink-0 text-purple-400" />
+                          </span>
                         )}
                       </div>
                       {fu.description && (

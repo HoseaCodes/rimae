@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getSettings } from '@/lib/actions/settings'
 import { isAIEnabled } from '@/lib/ai'
 import { callProvider, generateEmbeddingVector } from '@/lib/providers'
+import { buildEmbeddingInput } from '@/lib/semantic/build-embedding-input'
 import { CATEGORY_OPTIONS } from '@/lib/constants'
 import type { ActionResult } from '@/lib/schemas'
 import type { EventCategory, EventWithMeta } from '@/lib/database.types'
@@ -240,7 +241,7 @@ export async function generateEventEmbeddingAction(
     return { success: false, error: 'Event not found.' }
   }
 
-  const input = `${event.title}\n\n${event.raw_text}`.slice(0, 8000)
+  const input = buildEmbeddingInput({ title: event.title, raw_text: event.raw_text })
 
   let embedding: number[]
   try {

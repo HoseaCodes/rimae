@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { CategoryBadge } from '@/components/shared/CategoryBadge'
 import { EVENT_TYPE_LABELS } from '@/lib/constants'
 import type { EventCategory, EventSeverity, EventStatus, EventType, SourceType } from '@/lib/database.types'
+import { getSimilarityLabel, getSimilarityColor } from '@/lib/semantic/build-embedding-input'
 
 export type ExplorerEvent = {
   id: string
@@ -19,6 +20,7 @@ export type ExplorerEvent = {
   source_type: SourceType | null
   tag_names: string[]
   project_id?: string
+  similarity?: number
 }
 
 interface EventsTableProps {
@@ -99,6 +101,14 @@ export function EventsTable({ events, totalCount, projectsMap }: EventsTableProp
                       {event.summary}
                     </p>
                   )}
+                  {event.similarity != null && (() => {
+                    const label = getSimilarityLabel(event.similarity)
+                    return (
+                      <span className={`mt-0.5 block text-[10px] font-medium ${getSimilarityColor(label)}`}>
+                        {label}
+                      </span>
+                    )
+                  })()}
                   {event.source_name && (
                     <p className="mt-0.5 text-xs text-muted-foreground/60">
                       {event.source_name}

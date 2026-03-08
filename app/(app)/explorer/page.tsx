@@ -112,14 +112,16 @@ export default async function ExplorerPage({ searchParams }: PageProps) {
           p_embedding: embedding,
           p_limit: 100,
         })
-        const semIds = ((semRaw ?? []) as { id: string; similarity: number }[]).map((r) => r.id)
+        const semResults = (semRaw ?? []) as { id: string; similarity: number }[]
+        const semIds = semResults.map((r) => r.id)
         if (semIds.length > 0) {
           const { data: semEvents } = await supabaseAny
             .from('events_with_meta')
             .select('id, title, summary, category, severity, status, event_type, event_timestamp, source_name, source_type, tag_names, project_id')
             .in('id', semIds)
+          const scoreMap = Object.fromEntries(semResults.map((r) => [r.id, r.similarity]))
           const byId = Object.fromEntries(((semEvents ?? []) as ExplorerEvent[]).map((e) => [e.id, e]))
-          events = semIds.map((id) => byId[id]).filter(Boolean)
+          events = semIds.map((id) => byId[id] ? { ...byId[id], similarity: scoreMap[id] } : null).filter(Boolean) as ExplorerEvent[]
           totalCount = events.length
         }
       } catch (err) {

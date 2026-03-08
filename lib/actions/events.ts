@@ -7,6 +7,7 @@ import { getActiveProjectId } from '@/lib/project-context'
 import type { ActionResult, EventFormValues } from '@/lib/schemas'
 import type { SourceType } from '@/lib/database.types'
 import { extractiveSummary } from '@/lib/ai'
+import { generateEventEmbeddingAction } from '@/lib/actions/enrich'
 
 // ─── Tag helpers ──────────────────────────────────────────────────────────────
 
@@ -125,6 +126,11 @@ export async function createEventAction(
 
   // Process tags
   await applyTags(eventId, data.tags_raw, supabase)
+
+  // Auto-generate embedding if AI + OpenAI key are available (fire-and-forget)
+  if (process.env.OPENAI_API_KEY) {
+    generateEventEmbeddingAction(eventId).catch(() => {})
+  }
 
   // Revalidate relevant paths
   revalidatePath('/')

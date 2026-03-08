@@ -25,6 +25,8 @@ import { PinButton } from '@/components/workflow/PinButton'
 import { FollowUpForm } from '@/components/workflow/FollowUpForm'
 import { FollowUpList } from '@/components/workflow/FollowUpList'
 import { isEventPinned, getFollowUpsForEvent } from '@/lib/workflow/queries'
+import { getActiveProject } from '@/lib/project-context'
+import { getSimilarityLabel, getSimilarityColor } from '@/lib/semantic/build-embedding-input'
 import type { EventWithMeta, EventSeverity, EventStatus, EventCategory } from '@/lib/database.types'
 
 interface PageProps {
@@ -62,10 +64,11 @@ export default async function EventDetailPage({ params }: PageProps) {
   const e = event as EventWithMeta
 
   // Workflow data — run in parallel with AI/related queries
-  const [settings, isPinned, followUps] = await Promise.all([
+  const [settings, isPinned, followUps, activeProject] = await Promise.all([
     getSettings(),
     isEventPinned(e.id),
     getFollowUpsForEvent(e.id),
+    getActiveProject(),
   ])
   const aiEnabled = isAIEnabled(settings)
   const qualityScore = eventQualityScore({
@@ -86,12 +89,16 @@ export default async function EventDetailPage({ params }: PageProps) {
     p_limit: 5,
   })
   const relatedIds = ((relatedRaw ?? []) as { id: string; similarity: number }[])
-  const relatedEvents = relatedIds.length
+  const scoreMap = Object.fromEntries(relatedIds.map((r) => [r.id, r.similarity]))
+  const relatedEvents: { id: string; title: string; category: EventCategory; severity: EventSeverity; status: EventStatus; similarity: number }[] = relatedIds.length
     ? ((await supabaseAny
         .from('events_with_meta')
         .select('id, title, category, severity, status')
         .in('id', relatedIds.map((r) => r.id))
-      ).data ?? []) as { id: string; title: string; category: EventCategory; severity: EventSeverity; status: EventStatus }[]
+      ).data ?? []).map((ev: { id: string; title: string; category: EventCategory; severity: EventSeverity; status: EventStatus }) => ({
+        ...ev,
+        similarity: scoreMap[ev.id] ?? 0,
+      }))
     : []
 
   return (
@@ -208,7 +215,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           <table className="w-full text-xs">
             <tbody className="divide-y divide-border">
               <MetaRow label="Event ID" value={e.id} mono />
-              <MetaRow label="Project" value="RIMAE" />
+              <MetaRow label="Project" value={activeProject?.name ?? 'RIMAE'} />
               <MetaRow
                 label="Event Time"
                 value={format(new Date(e.event_timestamp), 'PPpp')}
@@ -273,20 +280,28 @@ export default async function EventDetailPage({ params }: PageProps) {
             Related Events
           </h2>
           <div className="divide-y divide-border overflow-hidden rounded-lg border border-border">
-            {relatedEvents.map((rel) => (
-              <Link
-                key={rel.id}
-                href={`/events/${rel.id}`}
-                className="flex items-center justify-between gap-4 px-3 py-2.5 text-sm transition-colors hover:bg-muted/40"
-              >
-                <span className="min-w-0 flex-1 truncate text-foreground/85">{rel.title}</span>
-                <div className="flex flex-shrink-0 items-center gap-1.5">
-                  <SeverityBadge severity={rel.severity} />
-                  <StatusBadge status={rel.status} />
-                  <CategoryBadge category={rel.category} />
-                </div>
-              </Link>
-            ))}
+            {relatedEvents.map((rel) => {
+              const simLabel = getSimilarityLabel(rel.similarity)
+              return (
+                <Link
+                  key={rel.id}
+                  href={`/events/${rel.id}`}
+                  className="flex items-center justify-between gap-4 px-3 py-2.5 text-sm transition-colors hover:bg-muted/40"
+                >
+                  <div className="min-w-0 flex-1">
+                    <span className="block truncate text-foreground/85">{rel.title}</span>
+                    <span className={`text-[10px] font-medium ${getSimilarityColor(simLabel)}`}>
+                      {simLabel}
+                    </span>
+                  </div>
+                  <div className="flex flex-shrink-0 items-center gap-1.5">
+                    <SeverityBadge severity={rel.severity} />
+                    <StatusBadge status={rel.status} />
+                    <CategoryBadge category={rel.category} />
+                  </div>
+                </Link>
+              )
+            })}
           </div>
         </section>
       )}
